@@ -4,6 +4,15 @@
     <h1>World-Clock</h1>
     {% if user.is_authenticated %}
         <h2>Hello {{ user.username }}</h2>
+        {% if user.profile.countries.all %}
+            {% for chosen in user.profile.chosencountry_set.all %}
+                <ul class="errorlist">
+                    <li><strong>{{ chosen.country.name }}: </strong>
+                        {{ chosen }}
+                    </li>
+                </ul>
+            {% endfor %}
+        {% endif %}
     {% else %}
         <h2>Please Register or Login</h2>
     {% endif %}
