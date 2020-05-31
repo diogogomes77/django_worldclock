@@ -1,13 +1,55 @@
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
-from app.forms import UserForm, ProfileForm
+from app.forms import UserForm, ChosenCountryForm
+from app.models import ChosenCountry
 
 
 def index(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            data = request.POST
+            if 'update' in request.POST:
+                _mutable = data._mutable
+                data._mutable = True
+                data['profile_id'] = request.user.profile.id
+                data._mutable = _mutable
+                print('post= ' + str(data))
+                chosen = ChosenCountry.objects.get(pk=data['id'])
+                chosen_form = ChosenCountryForm(data=data, instance=chosen)
+                if chosen_form.is_valid():
+                    chosen_form.save()
+                else:
+                    print(chosen_form.errors)
+            if 'delete' in request.POST:
+                chosen = get_object_or_404(ChosenCountry, pk=data['id'])
+                chosen.delete()
+            if 'create' in request.POST:
+                _mutable = data._mutable
+                data._mutable = True
+                data['profile'] = request.user.profile.id
+                data._mutable = _mutable
+                print('create post= ' + str(data))
+                new_chosen_form = ChosenCountryForm(data=data)
+                #chosen = new_chosen_form.save(commit=False)
+                #chosen.profile = request.user.profile
+                #chosen.save()
+                if new_chosen_form.is_valid():
+                    new_chosen_form.save()
+                else:
+                    print(new_chosen_form.errors)
+        chosen_forms = []
+        for chosen in request.user.profile.chosencountry_set.all():
+            chosen_forms.append(ChosenCountryForm(instance=chosen))
+
+        form = ChosenCountryForm(initial={'profile': request.user.profile})
+        return render(request, 'app/index.html',
+                      {'chosen_forms': chosen_forms,
+                       'form': form
+                       })
     return render(request,'app/index.html')
 
 
@@ -57,4 +99,17 @@ def user_login(request):
             print("They used username: {} and password: {}".format(username,password))
             return HttpResponse("Invalid login details given")
     else:
+
         return render(request, 'app/login.html', {})
+
+
+def change_format(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            chosen_form = ChosenCountryForm(data=request.POST)
+            if chosen_form.is_valid():
+                chosen = chosen_form.save()
+            else:
+                print(chosen_form.errors)
+
+

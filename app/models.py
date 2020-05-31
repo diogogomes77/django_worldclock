@@ -42,10 +42,13 @@ class ChosenCountry(models.Model):
     format = models.IntegerField(choices=FORMATS, default=1)
 
     def __str__(self):
-        timezone = self.country.timezone
-        now = datetime.datetime.now(timezone)
-        now = now.strftime(self.get_format_display())
+        now = self.time.strftime(self.get_format_display())
         return now
+
+    @property
+    def time(self):
+        timezone = self.country.timezone
+        return datetime.datetime.now(timezone)
 
 
 class Profile(models.Model):

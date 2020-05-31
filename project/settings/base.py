@@ -147,3 +147,6 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 STATICFILES_DIRS = (
     os.path.join(PROJECT_DIR, 'staticfiles'),
 )
+
+#CHANNEL_LAYERS = {
+#“default”: {      “BACKEND”: “asgi_redis.RedisChannelLayer”,      “CONFIG”: {         “hosts”: [(redis_host, 6379)],    },    “ROUTING”: “routing.application”,   },}

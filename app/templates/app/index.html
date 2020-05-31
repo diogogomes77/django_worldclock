@@ -4,15 +4,29 @@
     <h1>World-Clock</h1>
     {% if user.is_authenticated %}
         <h2>Hello {{ user.username }}</h2>
-        {% if user.profile.countries.all %}
-            {% for chosen in user.profile.chosencountry_set.all %}
+
+        {% if chosen_forms %}
+            {% for chosen in chosen_forms %}
                 <ul class="errorlist">
-                    <li><strong>{{ chosen.country.name }}: </strong>
-                        {{ chosen }}
+                    <li>
+                        <form enctype="multipart/form-data" method="POST">
+                            {% csrf_token %}
+                            {{ chosen }}
+                            <input type="hidden" name="id" value="{{ chosen.instance.id }}">
+                            <input type="submit" name="update" value="Update">
+                            <input type="submit" name="delete" value="Delete">
+                            {{ chosen.instance }}
+                        </form>
                     </li>
+
                 </ul>
             {% endfor %}
         {% endif %}
+        <form enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" name="create" value="Add">
+        </form>
     {% else %}
         <h2>Please Register or Login</h2>
     {% endif %}
