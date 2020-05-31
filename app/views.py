@@ -4,11 +4,55 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
-from app.forms import UserForm, ChosenCountryForm
-from app.models import ChosenCountry
+from app.forms import UserForm, ChosenCountryForm, ChosenForm
+from app.models import ChosenCountry, Chosen
 
 
 def index(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            data = request.POST
+            if 'update' in request.POST:
+                _mutable = data._mutable
+                data._mutable = True
+                data['profile_id'] = request.user.profile.id
+                data._mutable = _mutable
+                print('post= ' + str(data))
+                chosen = Chosen.objects.get(pk=data['id'])
+                chosen_form = ChosenForm(data=data, instance=chosen)
+                if chosen_form.is_valid():
+                    chosen_form.save()
+                else:
+                    print(chosen_form.errors)
+            if 'delete' in request.POST:
+                chosen = get_object_or_404(Chosen, pk=data['id'])
+                chosen.delete()
+            if 'create' in request.POST:
+                _mutable = data._mutable
+                data._mutable = True
+                data['profile'] = request.user.profile.id
+                data._mutable = _mutable
+                print('create post= ' + str(data))
+                new_chosen_form = ChosenForm(data=data)
+                #chosen = new_chosen_form.save(commit=False)
+                #chosen.profile = request.user.profile
+                #chosen.save()
+                if new_chosen_form.is_valid():
+                    new_chosen_form.save()
+                else:
+                    print(new_chosen_form.errors)
+        chosen_forms = []
+        for chosen in request.user.profile.chosen.all():
+            chosen_forms.append(ChosenForm(instance=chosen))
+
+        form = ChosenForm(initial={'profile': request.user.profile})
+        return render(request, 'app/index.html',
+                      {'chosen_forms': chosen_forms,
+                       'form': form
+                       })
+    return render(request,'app/index.html')
+
+def index_(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             data = request.POST

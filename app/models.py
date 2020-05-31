@@ -50,6 +50,34 @@ class ChosenCountry(models.Model):
         timezone = self.country.timezone
         return datetime.datetime.now(timezone)
 
+class Chosen(models.Model):
+    FORMATS = (
+        (1, "%H:%M:%S"),
+        (2, "%l:%M:%p"),
+        (3, "%r"),
+        (4, "%R"),
+        (5, "%T")
+    )
+
+    format = models.IntegerField(choices=FORMATS, default=1)
+
+    timezone = TimeZoneField(default='Europe/Lisbon')
+
+    profile = models.ForeignKey(
+        'Profile',
+        related_name='chosen',
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        now = self.time.strftime(self.get_format_display())
+        return now
+
+    @property
+    def time(self):
+        timezone = self.timezone
+        return datetime.datetime.now(timezone)
+
 
 class Profile(models.Model):
     user = models.OneToOneField(
@@ -65,33 +93,6 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
-
-    def add_country(self, country):
-        total_countries = self.countries.count()
-        # check if 5 to 10 different countries
-        if total_countries < 5 or total_countries > 10:
-            return False
-
-        # creates hascountry preventing duplicates
-        ChosenCountry.objects.get_or_create(
-            country=country,
-            profile=self
-        )
-        return True
-
-    def del_country(self, country):
-        total_countries = self.countries.count()
-        # prevents having less than 5 countries
-        if total_countries < 6:
-            return False
-        qs_delete = ChosenCountry.objects.filter(
-            country=country,
-            profile=self
-        )
-        if qs_delete.count() == 0:
-            return False
-        qs_delete.delete()
-        return True
 
 
 @receiver(post_save, sender=User, )
