@@ -143,10 +143,10 @@ LOGIN_URL = '/app/user_login/'
 PROJECT_DIR = os.path.dirname(__file__)
 MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media')
 MEDIA_URL = '/media/'
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_DIR, 'staticfiles'),
-)
+STATIC_ROOT = '/code/static'
+#STATICFILES_DIRS = (
+#    os.path.join(PROJECT_DIR, 'static'),
+#)
 
 #CHANNEL_LAYERS = {
 #“default”: {      “BACKEND”: “asgi_redis.RedisChannelLayer”,      “CONFIG”: {         “hosts”: [(redis_host, 6379)],    },    “ROUTING”: “routing.application”,   },}
