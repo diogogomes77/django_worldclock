@@ -150,3 +150,4 @@ STATICFILES_DIRS = (
 
 #CHANNEL_LAYERS = {
 #“default”: {      “BACKEND”: “asgi_redis.RedisChannelLayer”,      “CONFIG”: {         “hosts”: [(redis_host, 6379)],    },    “ROUTING”: “routing.application”,   },}
+# Configure Django App for Heroku.

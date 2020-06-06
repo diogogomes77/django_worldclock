@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y \
 postgresql-client \
 && rm -rf /var/lib/apt/lists/*
 
-COPY ./requirements /requirements
-RUN pip install -r /requirements/requirements.txt
+COPY ./requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt
 
 ADD . /code/
 RUN mkdir -p /code/static
